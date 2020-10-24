@@ -45,16 +45,10 @@ for i in $(awk '{print $1}' chr-length.txt | sort -u); do
     # 1 88327 Smp_329140
     # 2 103403 Smp_315690
 
-    sort -nk3 $i.txt | awk '{print NR, $4}'| sed 's/,/ /g'| awk -v OFS='\t' '{for (i=2;i<=NF;i++) print $1,$i}'| awk '{print $2, $1}'| sort -k1,1 -k2,2n|awk '$1>p || $2!=q+1{if(NR>1)print p,c,q-c+1,q; c=0} {p=$1; q=$2; c++} END{print p,c}' | awk '$2>2'|sort|join func-names.txt - | awk '{print $1 ":" $2, $3, $4, $5}' > $i-pos
+    sort -nk3 $i.txt | awk '{print NR, $4}'| sed 's/,/ /g'| awk -v OFS='\t' '{for (i=2;i<=NF;i++) print $1,$i}'| awk '{print $2, $1}'| sort -k1,1 -k2,2n|awk '$1>p || $2!=q+1{if(NR>1)print p,c,q-c+1,q; c=0} {p=$1; q=$2; c++} END{print p,c,q-c+1,q}' | awk '$2>2'|sort|join func-names.txt - | awk '{print $1 ":" $2, $3, $4, $5}' > $i-pos
     # function genes first_No last_No
     # PF00188:CAP 3 273 275
     # PF00209:SNF 3 731 733
-
-    # in the above command, if the last gene is in a cluster, the orders cannot be obtained, needs to check
-    if [[ $(tail -n1 $i-pos | awk '{print $3}') -eq 0 ]]; then
-	echo "STOPPED. CHECK LAST GENE IN ${i}"
-	break
-    fi
 
     awk '{print FILENAME, $0}' $i-pos > $i.clusters
     # SM_V7_1-pos PF00188:CAP 3 273 275
